@@ -2,7 +2,6 @@
   <body>
     <script src="../dist/lightwallet.min.js"></script>
     <script type="text/javascript" src="../node_modules/chain3/index.js"></script>
-    <script type="text/javascript" src="../node_modules/hooked-web3-provider/build/hooked-web3-provider.js"></script>
     <script type="text/javascript" src="../node_modules/async/lib/async.js"></script>
 
     <script>
@@ -10,13 +9,19 @@
       var chain3 = new Chain3();
       var global_keystore;
 
-      function setWeb3Provider(keystore) {
-        var web3Provider = new HookedWeb3Provider({
-          host: "https://rinkeby.infura.io/",
-          transaction_signer: keystore
-        });
-
-        web3.setProvider(web3Provider);
+      // function setChain3Provider(keystore) {
+      //  var web3Provider = new HookedWeb3Provider({
+      //    host: "https://rinkeby.infura.io/",
+      //    transaction_signer: keystore
+      // });
+      function setChain3Provider(keystore) {
+        // Check if moac already set a provider
+        if (typeof chain3 !== 'undefined') {
+          chain3 = new Chain3(chain3.currentProvider);
+        } else {
+          // set the provider you want from Chain3.providers
+          chain3 = new Chain3(new Chain3.providers.HttpProvider("http://localhost:8545"));
+        }
       }
 
       function newAddresses(password) {
@@ -75,7 +80,7 @@
         document.getElementById('seed').value = ''
 
         newAddresses(password);
-        setWeb3Provider(global_keystore);
+        setChain3Provider(global_keystore);
 
         getBalances();
         })
@@ -102,7 +107,7 @@
         global_keystore = ks
 
         newAddresses(password);
-        setWeb3Provider(global_keystore);
+        setChain3Provider(global_keystore);
         getBalances();
         })
       }
